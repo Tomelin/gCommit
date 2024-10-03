@@ -47,12 +47,22 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: ${{ github.repository }}
-        # flags: unittests
-        # name: codecov-umbrella
-        # fail_ci_if_error: true
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
 
     - name: Upload test result  s to Codeco v
       if: ${{ !cancelled() }} 
       uses: codecov/test-results-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+
+
+    - name: Check for tests
+      id: check_tests
+      run: |
+        if [ -z "$(go test -list . | grep -v '^ok' | grep -v '^PASS' | grep -v '^$')" ]; then
+          echo "No tests found"
+          exit 1
+        fi
+  
