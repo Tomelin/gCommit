@@ -41,7 +41,7 @@ jobs:
         GOOS=$GOOS GOARCH=$GOARCH go build -o dist/$OUTPUT_NAME
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.os }}-binary
         path: dist/
