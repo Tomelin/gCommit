@@ -38,30 +38,11 @@ gcommit --commit "feat: add new feature"
 
 ## Example
 Here is an example of how to use **gCommit** in interactive mode:
+![Demo to commit](./.assets/imgs/demo.gif)
 
-```
-$ gcommit --interactive
-Select kind of commit:
-  1. feat
-  2. fix
-  3. chore
-  4. docs
-  5. style
-  6. refactor
-  7. perf
-  8. test
-> 1
+**Result of the commit**
+![Result to commit](./.assets/imgs/result.png)
 
-Write the task id:
-> 12345
-
-Enable emoji in commit message? (y/n):
-> y
-
-Commit Message:
-> Add new feature for user authentication
-
-```
 You chose ```feat: :sparkles: Add new feature for user authentication"```
 
 Contributing
