@@ -1,7 +1,7 @@
 /*
 Copyright © 2024 Rafael Tomelin
 */
-package cmd
+package cli
 
 import (
 	"errors"

@@ -1,4 +1,5 @@
 name: validate-golang-code
+run-name: ${{ github.actor }} is validate code out GitHub Actions
 
 on:
   push:
@@ -11,7 +12,7 @@ on:
       - develop
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
