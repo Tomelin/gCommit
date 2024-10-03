@@ -40,8 +40,8 @@ jobs:
           macos-latest) GOOS=darwin ;;
         esac
         GOARCH=amd64
-        OUTPUT_NAME=yourproject
-        if [ "$GOOS" = "windows" ]; then OUTPUT_NAME=yourproject.exe; fi
+        OUTPUT_NAME=gCommit
+        if [ "$GOOS" = "windows" ]; then OUTPUT_NAME=gCommit.exe; fi
         GOOS=$GOOS GOARCH=$GOARCH go build -o dist/$OUTPUT_NAME ./cmd/main.go
 
     - name: Upload artifact
@@ -78,7 +78,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: ${{ github.run_number }}
         release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
@@ -89,8 +89,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/ubuntu/yourproject
-        asset_name: yourproject-ubuntu
+        asset_path: dist/ubuntu/gCommit
+        asset_name: gCommit-ubuntu
         asset_content_type: application/octet-stream
 
     - name: Upload Release Asset (Windows)
@@ -99,8 +99,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/windows/yourproject.exe
-        asset_name: yourproject-windows.exe
+        asset_path: dist/windows/gCommit.exe
+        asset_name: gCommit-windows.exe
         asset_content_type: application/octet-stream
 
     - name: Upload Release Asset (macOS)
@@ -109,6 +109,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/macos/yourproject
-        asset_name: yourproject-macos
+        asset_path: dist/macos/gCommit
+        asset_name: gCommit-macos
         asset_content_type: application/octet-stream
