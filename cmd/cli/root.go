@@ -28,7 +28,8 @@ You can also create a commit with an emoji in the message
 You can also create a commit with a type of commit
 You can also create a commit in interactive mode
 You can also push the commit to the remote repository
-You can also reset the commit to the head`,
+You can also reset the commit to the head
+`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := checkGitCommand(); err != nil {
