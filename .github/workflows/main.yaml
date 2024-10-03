@@ -37,13 +37,11 @@ jobs:
       run: go test -v ./...
 
     - name: Check test coverage
-      run: go test -coverprofile=coverage.out ./...
+      run: go test -coverprofile=coverage.txt ./...
     
     - name: git repository
       run: echo ${{ github.repository }}
 
-    - name: go test coverage
-      run: go test -coverprofile=coverage.txt
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
