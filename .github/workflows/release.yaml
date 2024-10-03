@@ -35,6 +35,7 @@ jobs:
       run: |
         echo ${{ matrix.os }} 
         echo ${{ matrix.os }} | cut -d'-' -f1
+        echo GOOS=$GOOS GOARCH=$GOARCH go build -o dist/$OUTPUT_NAME
 
     - name: Build binary
       run: |
