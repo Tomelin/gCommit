@@ -20,13 +20,15 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "cli",
 	Short: "Create a conventional commit",
-	Long: `cli is a tool to create conventional commits
-	You can create a commit with a message and a body message
-	You can also create a commit with a task id and a task status
-	You can also create a commit with an emoji in the message
-	You can also create a commit with a type of commit
-	You can also create a commit in interactive mode
-	You can also push the commit to the remote repository`,
+	Long: `
+cli is a tool to create conventional commits
+You can create a commit with a message and a body message
+You can also create a commit with a task id and a task status
+You can also create a commit with an emoji in the message
+You can also create a commit with a type of commit
+You can also create a commit in interactive mode
+You can also push the commit to the remote repository
+You can also reset the commit to the head`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := checkGitCommand(); err != nil {
