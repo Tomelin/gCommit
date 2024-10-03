@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+# on:
+#   push:
+#     tags:
+#       - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go-version: [1.17]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Build binary
+      run: |
+        mkdir -p dist
+        GOOS=$(echo ${{ matrix.os }} | cut -d'-' -f1)
+        GOARCH=amd64
+        OUTPUT_NAME=yourproject
+        if [ "$GOOS" = "windows" ]; then OUTPUT_NAME=yourproject.exe; fi
+        GOOS=$GOOS GOARCH=$GOARCH go build -o dist/$OUTPUT_NAME
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.os }}-binary
+        path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: ubuntu-latest-binary
+        path: dist/ubuntu
+    - uses: actions/download-artifact@v2
+      with:
+        name: windows-latest-binary
+        path: dist/windows
+    - uses: actions/download-artifact@v2
+      with:
+        name: macos-latest-binary
+        path: dist/macos
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset (Ubuntu)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/ubuntu/yourproject
+        asset_name: yourproject-ubuntu
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset (Windows)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/windows/yourproject.exe
+        asset_name: yourproject-windows.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload Release Asset (macOS)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dist/macos/yourproject
+        asset_name: yourproject-macos
+        asset_content_type: application/octet-stream

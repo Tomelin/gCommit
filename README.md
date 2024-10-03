@@ -16,7 +16,7 @@
 To install `gCommit`, you need to have Go installed on your machine. Then, you can use the following command to install the tool:
 
 ```sh
-go install github.com/yourusername/gcommit@latest
+go install github.com/Tomelin/gCommit@latest
 ````
 
 ## Usage
