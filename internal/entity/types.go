@@ -199,7 +199,6 @@ func (s *Status) FromString(status string) Status {
 }
 
 func (s *Status) StatusList() []string {
-
 	status := []string{"ignored", "ready", "notReady", "inProgress", "resolved", "backlog", "done", "removed"}
 	sort.Strings(status)
 	return status

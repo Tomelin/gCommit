@@ -75,20 +75,6 @@ to quickly create a Cobra application.`,
 				os.Exit(1)
 			}
 		}
-
-		// commit, _ := cmd.Flags().GetString("commit")
-		// if commit == "" {
-		// 	fmt.Println("NON Commit message:", commit)
-		// } else {
-		// 	fmt.Println("Commit message:", commit)
-		// }
-
-		// commitType, _ := cmd.Flags().GetString("type")
-		// if commitType == "" {
-		// 	fmt.Println("NON Commit message:", commit)
-		// } else {
-		// 	fmt.Println("Commit message:", commit)
-		// }
 	},
 }
 
@@ -102,14 +88,7 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
 	rootCmd.PersistentFlags().BoolP("interactive", "i", false, "Interactive mode")
 	rootCmd.Flags().BoolP("push", "p", false, "Push the commit")
 	rootCmd.Flags().UintP("reset", "r", 0, "Number of head to reaset")
