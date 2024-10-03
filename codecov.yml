@@ -1,0 +1,18 @@
+coverage:
+  status:
+    project:
+      default:   # default is the status check's name, not default settings
+        target: 80% # target coverage percentage 
+        threshold: 5
+        base: auto 
+        flags: 
+          - unit
+        paths: 
+          - "src"
+       # advanced settings
+        branches: 
+          - main
+          - develop
+        if_ci_failed: error #success, failure, error, ignore
+        informational: false
+        only_pulls: false

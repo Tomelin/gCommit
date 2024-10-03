@@ -1,0 +1,59 @@
+name: validate-golang-code
+run-name: ${{ github.actor }} is validate code out GitHub Actions
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.23
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Verify code formatting
+      run: go fmt ./...
+
+    - name: Run static analysis
+      run: go vet ./...
+
+    - name: Run tests
+      run: go test -v ./...
+
+    - name: Check test coverage
+      run: go test -coverprofile=coverage.txt ./...
+    
+    - name: git repository
+      run: echo ${{ github.repository }}
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: ${{ github.repository }}
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+
+    - name: Upload test result  s to Codeco v
+      if: ${{ !cancelled() }} 
+      uses: codecov/test-results-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+  
