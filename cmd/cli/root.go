@@ -19,16 +19,15 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Create a conventional commit",
+	Long: `cli is a tool to create conventional commits
+	You can create a commit with a message and a body message
+	You can also create a commit with a task id and a task status
+	You can also create a commit with an emoji in the message
+	You can also create a commit with a type of commit
+	You can also create a commit in interactive mode
+	You can also push the commit to the remote repository`,
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := checkGitCommand(); err != nil {
 			fmt.Println(err)
