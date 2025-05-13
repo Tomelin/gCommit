@@ -37,9 +37,11 @@ You can also reset the commit to the head
 			os.Exit(0)
 		}
 
+		shortDesc, _ := cmd.Flags().GetBool("short")
+
 		interactive, _ := cmd.Flags().GetBool("interactive")
 		if interactive {
-			interactive, err := interactiveMode()
+			interactive, err := interactiveMode(shortDesc)
 			if err != nil {
 				fmt.Printf("Error: %v\n", err)
 				os.Exit(1)
@@ -99,6 +101,7 @@ func init() {
 	rootCmd.Flags().String("taskId", "", "Task id")
 	rootCmd.Flags().String("body", "", "Body message of commit")
 	rootCmd.Flags().String("emoji", "", "Put emoji in commit message")
+	rootCmd.Flags().BoolP("short", "c", false, "Short description")
 }
 
 // interactiveMode is a function that runs the interactive mode
@@ -110,7 +113,7 @@ func init() {
 //
 // message in the body
 // Resolve: #123
-func interactiveMode() (*entity.Commit, error) {
+func interactiveMode(short bool) (*entity.Commit, error) {
 
 	opts := entity.Commit{}
 
@@ -131,6 +134,7 @@ func interactiveMode() (*entity.Commit, error) {
 	if err != nil {
 		return nil, fmt.Errorf("select prompt failed %v", err)
 	}
+
 	opts.Option = opts.Option.FromString(result)
 	opts.Choice = result
 	// ENDS Commit type
@@ -183,6 +187,11 @@ func interactiveMode() (*entity.Commit, error) {
 	}
 	opts.Comment = commitBodyResult
 	// ENDS  body message
+
+	// Long description
+	if short {
+		return &opts, nil
+	}
 
 	// STARTS task status
 	promptStatus := promptui.Select{
