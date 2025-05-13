@@ -11,13 +11,18 @@ import (
 
 	"github.com/google/go-github/v57/github"
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
 )
 
 type PRStructure struct {
-	branch string
-	title  string
-	head   string
-	body   string
+	branch          string
+	title           string
+	head            string
+	body            string
+	gitToken        string
+	ownerRepository string
+	repositoryName  string
+	typeFeature     string
 }
 
 // prCmd represents the pr command
@@ -27,8 +32,8 @@ var prCmd = &cobra.Command{
 	Long:  `Create a pull request`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("pr called")
-		branch, err := cmd.Flags().GetString("branch")
+
+		branch, err := cmd.Flags().GetString("destination")
 		if err != nil {
 			fmt.Println("Erro ao obter a flag 'branch':", err.Error())
 			os.Exit(1)
@@ -59,22 +64,45 @@ var prCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		head, err := cmd.Flags().GetString("head")
+		head, err := cmd.Flags().GetString("source")
 		if err != nil {
 			fmt.Println("Erro ao obter a flag 'head':", err.Error())
 			os.Exit(1)
 		}
 
-		log.Println("Title:", title)
-		log.Println("Branch:", branch)
-		log.Println("Body:", body)
-		log.Println("Head:", head)
+		token, err := cmd.Flags().GetString("token")
+		if err != nil {
+			fmt.Println("Erro ao obter a flag 'token':", err.Error())
+			os.Exit(1)
+		}
+
+		owner, err := cmd.Flags().GetString("owner")
+		if err != nil {
+			fmt.Println("Erro ao obter a flag 'owner':", err.Error())
+			os.Exit(1)
+		}
+
+		repository, err := cmd.Flags().GetString("repository")
+		if err != nil {
+			fmt.Println("Erro ao obter a flag 'repository':", err.Error())
+			os.Exit(1)
+		}
+
+		typeFeature, err := cmd.Flags().GetString("type")
+		if err != nil {
+			fmt.Println("Erro ao obter a flag 'repository':", err.Error())
+			os.Exit(1)
+		}
 
 		pr := PRStructure{
-			branch: branch,
-			title:  title,
-			head:   head,
-			body:   body,
+			branch:          branch,
+			title:           title,
+			head:            head,
+			body:            body,
+			gitToken:        token,
+			ownerRepository: owner,
+			repositoryName:  repository,
+			typeFeature:     typeFeature,
 		}
 		createPR(&pr)
 	},
@@ -83,30 +111,68 @@ var prCmd = &cobra.Command{
 func init() {
 
 	rootCmd.AddCommand(prCmd)
-	prCmd.Flags().StringP("branch", "b", "", "Destination branch")
+	prCmd.Flags().StringP("destination", "d", "", "Destination branch")
 	prCmd.Flags().StringP("title", "t", "", "PR title")
-	prCmd.Flags().StringP("head", "x", "", "Feature branch")
-	prCmd.Flags().StringP("body", "d", "", "Create body")
+	prCmd.Flags().StringP("source", "s", "", "Source branch")
+	prCmd.Flags().StringP("body", "b", "", "Create body")
+	prCmd.Flags().String("type", "f", "Commit type (feat, fix, chore, docs, style, refactor, perf, test, ci, build, revert)")
+	prCmd.Flags().StringP("token", "e", "", "Git Token Environment variable default (GIT_TOKEN)")
+	prCmd.Flags().StringP("owner", "o", "", "Git owner repository  Environment variable default (GIT_OWNER)")
+	prCmd.Flags().String("repository", "r", "Git repository name")
 
+	prCmd.MarkFlagRequired("repository")
+	prCmd.MarkFlagRequired("type")
 }
 
 func createPR(prData *PRStructure) {
 
-	client := github.NewClient(nil)
+	token := os.Getenv("GIT_TOKEN")
+	if prData.gitToken != "" {
+		token = prData.gitToken
+	}
+	if token == "" {
+		log.Fatal("A variável de ambiente GITHUB_TOKEN não está definida.")
+	}
+
+	repoOwner := os.Getenv("GIT_OWNER")
+	if prData.ownerRepository != "" {
+		repoOwner = prData.ownerRepository
+	}
+	if repoOwner == "" {
+		log.Fatal("A variável de ambiente GIT_OWNER não está definida.")
+	}
+
+	repoName := os.Getenv("GIT_REPO")
+	if prData.repositoryName == "" && repoName == "" {
+		log.Fatal("repository name is required")
+	}
+
+	if prData.repositoryName != "" {
+		repoName = prData.repositoryName
+	}
+
+	ctx := context.Background()
+
+	// Autenticação
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+	title := fmt.Sprintf("%s: %s", prData.typeFeature, prData.title)
 	newPR := &github.NewPullRequest{
-		Title:               github.String(prData.title),
+		Title:               github.String(title),
 		Head:                github.String(prData.head),
 		Base:                github.String(prData.branch),
 		Body:                github.String(prData.body),
 		MaintainerCanModify: github.Bool(true), // Permite que o mantenedor modifique o PR
 	}
-	ctx := context.Background()
-	pr, response, err := client.PullRequests.Create(ctx, "Tomelin", "gCommit", newPR)
+
+	pr, _, err := client.PullRequests.Create(ctx, repoOwner, prData.repositoryName, newPR)
 	if err != nil {
 		log.Fatalf("Erro ao criar o Pull Request: %v", err)
 	}
 
-	log.Println(response)
 	fmt.Printf("Pull Request criado com sucesso! URL: %s\n", pr.GetHTMLURL())
-
 }
